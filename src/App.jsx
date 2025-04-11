@@ -18,11 +18,8 @@ const list = [
   }
 ];
 
-function List() {
+function Item({item}) {
   return (
-    <ul>
-      {list.map(function (item) {
-        return (
           <li key={item.objectID}>
             <span>
               <a href={item.url}>{item.title}</a>
@@ -31,6 +28,14 @@ function List() {
             <span>{item.num_comments}</span>
             <span>{item.points}</span>
           </li>
+  );
+}
+
+function List() {
+  return (
+    <ul>
+      {list.map(function (item) {
+        <Item item={item} key={item.objectID} />;
         );
       })}
     </ul>
