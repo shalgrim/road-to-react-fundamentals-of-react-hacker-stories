@@ -18,7 +18,7 @@ const list = [
   }
 ];
 
-function Item({ item }) {
+const Item = ({ item }) => {
   return (
     <li key={item.objectID}>
       <span>
@@ -31,40 +31,32 @@ function Item({ item }) {
   );
 }
 
-function List() {
-  return (
-    <ul>
-      {
-        list.map(function (item) {
-          return <Item item=item key=item.objectID />;
-        })
-      }
-    </ul>
-  );
-}
+const List = () => (
+  <ul>
+    {list.map((item) => (
+      <Item item=item key=item.objectID />
+        ))}
+  </ul>
+);
 
-function Search() {
-  return (
-    <div>
-      <label htmlFor="search">Search: </label>
-      <input id="search" type="text" />
-    </div>
-  );
-}
+const Search = () => (
+  <div>
+    <label htmlFor="search">Search: </label>
+    <input id="search" type="text" />
+  </div>
+);
 
 
-function App() {
-  return (
-    <div>
-      <h1>My Hacker Stories</h1>
+const App = () => (
+  <div>
+    <h1>My Hacker Stories</h1>
 
-      <Search />
+    <Search />
 
-      <hr />
+    <hr />
 
-      <List />
-    </div>
-  );
-}
+    <List />
+  </div>
+);
 
 export default App;
