@@ -1,26 +1,10 @@
+import * as React from 'react';
 
-const list = [
-  {
-    title: 'React',
-    url: 'https://reactjs.org',
-    author: 'Jordan Walke',
-    num_comments: 3,
-    points: 4,
-    objectID: 0
-  },
-  {
-    title: 'Redux',
-    url: 'https://redux.js.org',
-    author: 'Dan Abramov, Andrew Clark',
-    num_comments: 2,
-    points: 5,
-    objectID: 1
-  }
-];
-
-const Item = ({ item }) => {
+const Item = (props) => {
+  console.log("Item renders");
+  const item = props.item;
   return (
-    <li key={item.objectID}>
+    <li key={props.key}>
       <span>
         <a href={item.url}>{item.title}</a>
       </span>
@@ -31,32 +15,65 @@ const Item = ({ item }) => {
   );
 }
 
-const List = () => (
-  <ul>
-    {list.map((item) => (
-      <Item item=item key=item.objectID />
-        ))}
-  </ul>
-);
+const List = (props) => {
+  console.log("List renders");
+  return (
+    <ul>
+      {props.list.map((item) => (
+        <Item key={item.objectID} item={item} />
+      ))}
+    </ul>
+  );
+};
 
-const Search = () => (
-  <div>
-    <label htmlFor="search">Search: </label>
-    <input id="search" type="text" />
-  </div>
-);
+const Search = (props) => {
+  return (
+    <div>
+      <label htmlFor="search">Search: </label>
+      <input id="search" type="text" onChange={props.onSearch} />
+    </div>
+  );
+};
 
 
-const App = () => (
-  <div>
-    <h1>My Hacker Stories</h1>
+const App = () => {
+  console.log("App renders");
+  const stories = [
+    {
+      title: 'React',
+      url: 'https://reactjs.org',
+      author: 'Jordan Walke',
+      num_comments: 3,
+      points: 4,
+      objectID: 0
+    },
+    {
+      title: 'Redux',
+      url: 'https://redux.js.org',
+      author: 'Dan Abramov, Andrew Clark',
+      num_comments: 2,
+      points: 5,
+      objectID: 1
+    }
+  ];
 
-    <Search />
+  const [searchTerm, setSearchTerm] = React.useState('React');
 
-    <hr />
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  }
 
-    <List />
-  </div>
-);
+  return (
+    <div>
+      <h1>My Hacker Stories</h1>
+
+      <Search onSearch={handleSearch} />
+
+      <hr />
+
+      <List list={stories.filter((story) => story.title.toLowerCase().includes(searchTerm.toLowerCase()))} />
+    </div>
+  );
+};
 
 export default App;
