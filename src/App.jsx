@@ -1,30 +1,32 @@
 import * as React from 'react';
 
-const Button = ({ onClick }) => (
-  <button type="button" onClick={onClick}>Remove</button>
-);
-
-const Item = ({ title, url, author, num_comments, points, onButtonClick }) => (
-  <li>
-    <span>
-      <a href={url}>{title}</a>
-    </span>
-    <span>{author}</span>
-    <span>{num_comments}</span>
-    <span>{points}</span>
-    <Button onClick={onButtonClick} />
-  </li>
-);
-
-const List = ({ list }) => {
-  const handleRemoveCallback = (event) => {
-    console.log(`Item ${event.target.key} removed`);
+const Item = ({ item, onRemoveItem }) => {
+  const handleRemoveItem = () => {
+    onRemoveItem(item);
   };
 
   return (
+    <li>
+      <span>
+        <a href={item.url}>{item.title}</a>
+      </span>
+      <span>{item.author}</span>
+      <span>{item.num_comments}</span>
+      <span>{item.points}</span>
+      <span>
+        <button type="button" onClick={handleRemoveItem}>
+          Dismiss
+        </button>
+      </span>
+    </li>
+  );
+};
+
+const List = ({ list, onRemoveItem }) => {
+  return (
     <ul>
-      {list.map(({ objectID, ...item }) => (
-        <Item key={objectID} onButtonClick={handleRemoveCallback} {...item} />
+      {list.map((item) => (
+        <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
       ))}
     </ul>
   );
@@ -61,7 +63,7 @@ const useStorageState = (key, initialState) => {
 
 const App = () => {
   console.log("App renders");
-  const stories = [
+  const initialStories = [
     {
       title: 'React',
       url: 'https://reactjs.org',
@@ -92,9 +94,12 @@ const App = () => {
     setSearchTerm2(event.target.value);
   }
 
-  /* eslint-disable no-unused-vars */
-  const [storiesList, setStoriesList] = React.useState(stories);
-  /* eslint-enable no-unused-vars */
+  const [storiesList, setStoriesList] = React.useState(initialStories);
+
+  const handleRemoveStory = (item) => {
+    const newStories = storiesList.filter((story) => item.objectID !== story.objectID);
+    setStoriesList(newStories);
+  }
 
   return (
     <div>
@@ -106,7 +111,7 @@ const App = () => {
 
       <hr />
 
-      <List list={storiesList} />
+      <List list={storiesList} onRemoveItem={handleRemoveStory} />
 
       <hr />
 
