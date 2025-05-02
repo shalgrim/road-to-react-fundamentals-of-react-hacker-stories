@@ -1,6 +1,10 @@
 import * as React from 'react';
 
-const Item = ({ title, url, author, num_comments, points }) => (
+const Button = ({ onClick }) => (
+  <button type="button" onClick={onClick}>Remove</button>
+);
+
+const Item = ({ title, url, author, num_comments, points, onButtonClick }) => (
   <li>
     <span>
       <a href={url}>{title}</a>
@@ -8,16 +12,23 @@ const Item = ({ title, url, author, num_comments, points }) => (
     <span>{author}</span>
     <span>{num_comments}</span>
     <span>{points}</span>
+    <Button onClick={onButtonClick} />
   </li>
 );
 
-const List = ({ list }) => (
-  <ul>
-    {list.map(({ objectID, ...item }) => (
-      <Item key={objectID} {...item} />
-    ))}
-  </ul>
-);
+const List = ({ list }) => {
+  const handleRemoveCallback = (event) => {
+    console.log(`Item ${event.target.key} removed`);
+  };
+
+  return (
+    <ul>
+      {list.map(({ objectID, ...item }) => (
+        <Item key={objectID} onButtonClick={handleRemoveCallback} {...item} />
+      ))}
+    </ul>
+  );
+};
 
 const InputWithLabel = ({ id, value, type = 'text', isFocused, onInputChange, children }) => {
   const inputRef = React.useRef();
@@ -81,6 +92,10 @@ const App = () => {
     setSearchTerm2(event.target.value);
   }
 
+  /* eslint-disable no-unused-vars */
+  const [storiesList, setStoriesList] = React.useState(stories);
+  /* eslint-enable no-unused-vars */
+
   return (
     <div>
       <h1>My Hacker Stories</h1>
@@ -91,7 +106,7 @@ const App = () => {
 
       <hr />
 
-      <List list={stories.filter((story) => story.title.toLowerCase().includes(searchTerm.toLowerCase()))} />
+      <List list={storiesList} />
 
       <hr />
 
