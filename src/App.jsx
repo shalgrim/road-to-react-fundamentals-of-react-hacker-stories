@@ -88,16 +88,6 @@ const App = () => {
   console.log("App renders");
   const [searchTerm, setSearchTerm] = useStorageState('search', 'React');
 
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-  }
-
-  const [searchTerm2, setSearchTerm2] = useStorageState('search2', 'foo');
-
-  const handleSearch2 = (event) => {
-    setSearchTerm2(event.target.value);
-  }
-
   const [stories, setStories] = React.useState([]);
 
   React.useEffect(() => {
@@ -111,6 +101,20 @@ const App = () => {
     setStories(newStories);
   }
 
+  const searchedStories = stories.filter((story) =>
+    story.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  }
+
+  const [searchTerm2, setSearchTerm2] = useStorageState('search2', 'foo');
+
+  const handleSearch2 = (event) => {
+    setSearchTerm2(event.target.value);
+  }
+
   return (
     <div>
       <h1>My Hacker Stories</h1>
@@ -121,7 +125,7 @@ const App = () => {
 
       <hr />
 
-      <List list={stories} onRemoveItem={handleRemoveStory} />
+      <List list={searchedStories} onRemoveItem={handleRemoveStory} />
 
       <hr />
 
