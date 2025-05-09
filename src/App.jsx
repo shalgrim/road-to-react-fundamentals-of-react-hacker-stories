@@ -78,6 +78,11 @@ const App = () => {
     }
   ];
 
+  const getAsyncStories = () =>
+    new Promise((resolve) =>
+      resolve({ data: { stories: initialStories } })
+    );
+
   const [searchTerm, setSearchTerm] = useStorageState('search', 'React');
 
   const handleSearch = (event) => {
@@ -90,11 +95,17 @@ const App = () => {
     setSearchTerm2(event.target.value);
   }
 
-  const [storiesList, setStoriesList] = React.useState(initialStories);
+  const [stories, setStories] = React.useState([]);
+
+  React.useEffect(() => {
+    getAsyncStories().then(result => {
+      setStories(result.data.stories);
+    });
+  }, []);
 
   const handleRemoveStory = (item) => {
-    const newStories = storiesList.filter((story) => item.objectID !== story.objectID);
-    setStoriesList(newStories);
+    const newStories = stories.filter((story) => item.objectID !== story.objectID);
+    setStories(newStories);
   }
 
   return (
@@ -107,7 +118,7 @@ const App = () => {
 
       <hr />
 
-      <List list={storiesList} onRemoveItem={handleRemoveStory} />
+      <List list={stories} onRemoveItem={handleRemoveStory} />
 
       <hr />
 
