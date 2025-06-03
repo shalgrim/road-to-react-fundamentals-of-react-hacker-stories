@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
+
 import * as React from 'react';
 
 const Item = ({ item, onRemoveItem }) => {
@@ -28,7 +31,7 @@ const List = ({ list, onRemoveItem }) => {
   );
 };
 
-const InputWithLabel = ({ id, value, type = 'text', isFocused, onInputChange, children }) => {
+const InputWithLabel = ({ id, value, type = 'text', isFocused, onInputChange, onSearchButtonPressed, children }) => {
   const inputRef = React.useRef();
 
   React.useEffect(() => {
@@ -42,6 +45,8 @@ const InputWithLabel = ({ id, value, type = 'text', isFocused, onInputChange, ch
       <label htmlFor={id}>{children}</label>
       &nbsp;
       <input ref={inputRef} id={id} type={type} value={value} autoFocus={isFocused} onChange={onInputChange} />
+      &nbsp;
+      <button type="button" onClick={onSearchButtonPressed}>Search It Up!</button>
     </>
   );
 };
@@ -56,65 +61,65 @@ const useStorageState = (key, initialState) => {
   return [value, setValue];
 }
 
-const initialStories = [
-  {
-    title: 'React',
-    url: 'https://reactjs.org',
-    author: 'Jordan Walke',
-    num_comments: 3,
-    points: 4,
-    objectID: 0
-  },
-  {
-    title: 'Redux',
-    url: 'https://redux.js.org',
-    author: 'Dan Abramov, Andrew Clark',
-    num_comments: 2,
-    points: 5,
-    objectID: 1
-  }
-];
-
-const getAsyncStories = () =>
-  new Promise((resolve) =>
-    setTimeout(
-      () => resolve({ data: { stories: initialStories } }),
-      2000
-    )
-  );
-
-  const storiesReducer = (state, action) => {
+const storiesReducer = (state, action) => {
     switch (action.type) {
-      case SET_STORIES:
-        return action.payload;
+      case 'STORIES_FETCH_INIT':
+        return {
+          ...state,
+          isLoading: true,
+          isError: false,
+        };
+      case 'STORIES_FETCH_SUCCESS':
+        return {
+          ...state,
+          isLoading: false,
+          isError: false,
+          data: action.payload,
+        };
+      case 'STORIES_FETCH_FAILURE':
+        return {
+          ...state,
+          isLoading: false,
+          isError: true,
+        };
       case REMOVE_STORY:
-        return state.filter(
-          (story) => story.objectID !== action.payload.objectID
-        );
+        return {
+          ...state,
+          data: state.data.filter(
+            (story) => story.objectID !== action.payload.objectID
+          ),
+        };
       default:
         throw new Error();
     }
   };
 
-const SET_STORIES = 'SET_STORIES';
 const REMOVE_STORY = 'REMOVE_STORY';
 const App = () => {
   const [searchTerm, setSearchTerm] = useStorageState('search', 'React');
-  const [stories, dispatchStories] = React.useReducer(storiesReducer, []);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [isError, setIsError] = React.useState(false);
+  const [stories, dispatchStories] = React.useReducer(
+    storiesReducer,
+    { data: [], isLoading: false, isError: false }
+  );
 
-  React.useEffect(() => {
-    setIsLoading(true);
-    getAsyncStories().then(result => {
+  // React.useEffect(() => {
+  const handleFetchStories = searchTerm => {
+    if (!searchTerm) return;  // I prefer it without this line
+
+    dispatchStories({ type: 'STORIES_FETCH_INIT' });
+
+    fetch(`${API_ENDPOINT}${searchTerm}`)
+    .then((response) => response.json())
+    .then((result) => {
       dispatchStories({
-        type: SET_STORIES,
-        payload: result.data.stories
+        type: 'STORIES_FETCH_SUCCESS',
+        payload: result.hits
       });
-      setIsLoading(false);
     })
-    .catch(() => setIsError(true));
-  }, []);
+    .catch(() =>
+      dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
+    );
+  };
 
   const handleRemoveStory = (item) => {
     dispatchStories({
@@ -122,10 +127,6 @@ const App = () => {
       payload: item
     });
   };
-
-  const searchedStories = stories.filter((story) =>
-    story.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -141,15 +142,22 @@ const App = () => {
     <div>
       <h1>My Hacker Stories</h1>
 
-      <InputWithLabel value={searchTerm} onInputChange={handleSearch} id="search1">
+      <InputWithLabel value={searchTerm} onInputChange={handleSearch} onSearchButtonPressed={handleFetchStories} id="search1">
         <strong>Search:</strong>
       </InputWithLabel>
 
       <hr />
 
-      {isError && <p>Something went wrong...</p>}
+      {stories.isError && <p>Something went wrong...</p>}
 
-      {isLoading ? "Loading..." : <List list={searchedStories} onRemoveItem={handleRemoveStory} />}
+      {stories.isLoading ? (
+        <p>Loading...</p>
+       ) : (
+       <List
+       list={stories.data}
+       onRemoveItem={handleRemoveStory}
+       />
+      )}
 
       <hr />
 
