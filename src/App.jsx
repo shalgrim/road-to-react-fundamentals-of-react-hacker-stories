@@ -103,7 +103,7 @@ const App = () => {
   );
 
   // React.useEffect(() => {
-  const handleFetchStories = searchTerm => {
+  const handleFetchStories = () => {
     if (!searchTerm) return;  // I prefer it without this line
 
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
