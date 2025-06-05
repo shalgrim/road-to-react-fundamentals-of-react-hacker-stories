@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-vars */
-const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
-
 import * as React from 'react';
+import axios from 'axios';
+
+const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
 
 const Item = ({ item, onRemoveItem }) => {
   return (
@@ -31,7 +32,7 @@ const List = ({ list, onRemoveItem }) => {
   );
 };
 
-const InputWithLabel = ({ id, value, type = 'text', isFocused, onInputChange, onSearchButtonPressed, children }) => {
+const InputWithLabel = ({ id, value, type = 'text', isFocused, onInputChange, children }) => {
   const inputRef = React.useRef();
 
   React.useEffect(() => {
@@ -46,7 +47,6 @@ const InputWithLabel = ({ id, value, type = 'text', isFocused, onInputChange, on
       &nbsp;
       <input ref={inputRef} id={id} type={type} value={value} autoFocus={isFocused} onChange={onInputChange} />
       &nbsp;
-      <button type="button" onClick={onSearchButtonPressed}>Search It Up!</button>
     </>
   );
 };
@@ -97,29 +97,35 @@ const storiesReducer = (state, action) => {
 const REMOVE_STORY = 'REMOVE_STORY';
 const App = () => {
   const [searchTerm, setSearchTerm] = useStorageState('search', 'React');
+
+  const [url, setUrl] = React.useState(
+    `${API_ENDPOINT}${searchTerm}`
+  );
+
   const [stories, dispatchStories] = React.useReducer(
     storiesReducer,
     { data: [], isLoading: false, isError: false }
   );
 
-  // React.useEffect(() => {
-  const handleFetchStories = () => {
-    if (!searchTerm) return;  // I prefer it without this line
-
+  const handleFetchStories = React.useCallback(() => {
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
 
-    fetch(`${API_ENDPOINT}${searchTerm}`)
-    .then((response) => response.json())
+    axios
+    .get(url)
     .then((result) => {
       dispatchStories({
         type: 'STORIES_FETCH_SUCCESS',
-        payload: result.hits
+        payload: result.data.hits
       });
     })
     .catch(() =>
       dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
     );
-  };
+  }, [url]);
+
+  React.useEffect(() => {
+    handleFetchStories();
+  }, [handleFetchStories]);
 
   const handleRemoveStory = (item) => {
     dispatchStories({
@@ -136,15 +142,31 @@ const App = () => {
 
   const handleSearch2 = (event) => {
     setSearchTerm2(event.target.value);
-  }
+  };
+
+  const handleSearchInput = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleSearchSubmit = () => {
+    setUrl(`${API_ENDPOINT}${searchTerm}`);
+  };
 
   return (
     <div>
       <h1>My Hacker Stories</h1>
 
-      <InputWithLabel value={searchTerm} onInputChange={handleSearch} onSearchButtonPressed={handleFetchStories} id="search1">
+      <InputWithLabel value={searchTerm} onInputChange={handleSearchInput} id="search1">
         <strong>Search:</strong>
       </InputWithLabel>
+
+      <button
+        type="button"
+        disabled={!searchTerm}
+        onClick={handleSearchSubmit}
+        >
+          Submit
+        </button>
 
       <hr />
 
