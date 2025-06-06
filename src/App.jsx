@@ -62,37 +62,37 @@ const useStorageState = (key, initialState) => {
 }
 
 const storiesReducer = (state, action) => {
-    switch (action.type) {
-      case 'STORIES_FETCH_INIT':
-        return {
-          ...state,
-          isLoading: true,
-          isError: false,
-        };
-      case 'STORIES_FETCH_SUCCESS':
-        return {
-          ...state,
-          isLoading: false,
-          isError: false,
-          data: action.payload,
-        };
-      case 'STORIES_FETCH_FAILURE':
-        return {
-          ...state,
-          isLoading: false,
-          isError: true,
-        };
-      case REMOVE_STORY:
-        return {
-          ...state,
-          data: state.data.filter(
-            (story) => story.objectID !== action.payload.objectID
-          ),
-        };
-      default:
-        throw new Error();
-    }
-  };
+  switch (action.type) {
+    case 'STORIES_FETCH_INIT':
+      return {
+        ...state,
+        isLoading: true,
+        isError: false,
+      };
+    case 'STORIES_FETCH_SUCCESS':
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        data: action.payload,
+      };
+    case 'STORIES_FETCH_FAILURE':
+      return {
+        ...state,
+        isLoading: false,
+        isError: true,
+      };
+    case REMOVE_STORY:
+      return {
+        ...state,
+        data: state.data.filter(
+          (story) => story.objectID !== action.payload.objectID
+        ),
+      };
+    default:
+      throw new Error();
+  }
+};
 
 const REMOVE_STORY = 'REMOVE_STORY';
 const App = () => {
@@ -107,20 +107,18 @@ const App = () => {
     { data: [], isLoading: false, isError: false }
   );
 
-  const handleFetchStories = React.useCallback(() => {
+  const handleFetchStories = React.useCallback(async () => {
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
 
-    axios
-    .get(url)
-    .then((result) => {
+    try {
+      const result = await axios.get(url);
       dispatchStories({
         type: 'STORIES_FETCH_SUCCESS',
         payload: result.data.hits
       });
-    })
-    .catch(() =>
+    } catch {
       dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
-    );
+    }
   }, [url]);
 
   React.useEffect(() => {
@@ -164,9 +162,9 @@ const App = () => {
         type="button"
         disabled={!searchTerm}
         onClick={handleSearchSubmit}
-        >
-          Submit
-        </button>
+      >
+        Submit
+      </button>
 
       <hr />
 
@@ -174,11 +172,11 @@ const App = () => {
 
       {stories.isLoading ? (
         <p>Loading...</p>
-       ) : (
-       <List
-       list={stories.data}
-       onRemoveItem={handleRemoveStory}
-       />
+      ) : (
+        <List
+          list={stories.data}
+          onRemoveItem={handleRemoveStory}
+        />
       )}
 
       <hr />
