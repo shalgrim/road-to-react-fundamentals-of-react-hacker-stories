@@ -146,32 +146,31 @@ const App = () => {
     setSearchTerm(event.target.value);
   };
 
-  const handleSearchSubmit = (event) => {
+  const searchAction = (event) => {
     setUrl(`${API_ENDPOINT}${searchTerm}`);
-    event.preventDefault():
   };
 
   const SearchForm = ({
     searchTerm,
     onSearchInput,
-    onSearchSubmit,
+    searchAction,
   }) => (
-    <form onSubmit={onSearchSubmit}>
+    <form action={searchAction}>
       <InputWithLabel
         id="search"
         value={searchTerm}
         isFocused
         onInputChange={onSearchInput}
-        >
-          <strong>Search:</strong>
-          </InputWithLabel>
+      >
+        <strong>Search:</strong>
+      </InputWithLabel>
 
-        <button
-          type="submit"
-          disabled={!searchTerm}
-        >
-          Submit
-        </button>
+      <button
+        type="submit"
+        disabled={!searchTerm}
+      >
+        Submit
+      </button>
     </form>
   );
 
@@ -180,9 +179,9 @@ const App = () => {
       <h1>My Hacker Stories</h1>
 
       <SearchForm
-      searchTerm={searchTerm}
-      onSearchInput={handleSearchInput}
-      onSearchSubmit={handleSearchSubmit}
+        searchTerm={searchTerm}
+        onSearchInput={handleSearchInput}
+        searchAction={searchAction}
       />
 
       <hr />
