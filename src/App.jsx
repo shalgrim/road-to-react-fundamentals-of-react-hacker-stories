@@ -52,9 +52,19 @@ const InputWithLabel = ({ id, value, type = 'text', isFocused, onInputChange, ch
 
   return (
     <>
-      <label htmlFor={id}>{children}</label>
+      <label htmlFor={id} className={styles.label}>
+        {children}
+      </label>
       &nbsp;
-      <input ref={inputRef} id={id} type={type} value={value} autoFocus={isFocused} onChange={onInputChange} />
+      <input
+        ref={inputRef}
+        id={id}
+        type={type}
+        value={value}
+        autoFocus={isFocused}
+        onChange={onInputChange}
+        className={styles.input}
+      />
       &nbsp;
     </>
   );
@@ -164,7 +174,10 @@ const App = () => {
     onSearchInput,
     searchAction,
   }) => (
-    <form action={searchAction}>
+    <form
+      action={searchAction}
+      className={styles.searchForm}
+    >
       <InputWithLabel
         id="search"
         value={searchTerm}
@@ -177,6 +190,7 @@ const App = () => {
       <button
         type="submit"
         disabled={!searchTerm}
+        className={`${styles.button} {styles.buttonLarge}`}
       >
         Submit
       </button>
