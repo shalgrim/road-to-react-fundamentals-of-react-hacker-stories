@@ -170,6 +170,7 @@ const App = () => {
     searchTerm,
     onSearchInput,
     searchAction,
+    buttonClass
   }) => (
     <form action={searchAction} className="search-form">
       <InputWithLabel
@@ -184,7 +185,7 @@ const App = () => {
       <button
         type="submit"
         disabled={!searchTerm}
-        className="button button_large"
+        className={`button ${buttonClass || ''}`}
       >
         Submit
       </button>
@@ -199,6 +200,7 @@ const App = () => {
         searchTerm={searchTerm}
         onSearchInput={handleSearchInput}
         searchAction={searchAction}
+        buttonClass="button_small"
       />
 
       <hr />
