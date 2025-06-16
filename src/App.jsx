@@ -22,15 +22,22 @@ const Item = ({ item, onRemoveItem }) => {
   );
 };
 
-const List = ({ list, onRemoveItem }) => {
-  return (
-    <ul>
-      {list.map((item) => (
-        <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
-      ))}
-    </ul>
-  );
-};
+console.log('B:App');
+
+const List = React.memo(
+  ({ list, onRemoveItem }) =>
+    console.log("B:List") || (
+      <ul>
+        {list.map((item) => (
+          <Item
+            key={item.objectID}
+            item={item}
+            onRemoveItem={onRemoveItem}
+          />
+        ))}
+      </ul>
+    )
+);
 
 const InputWithLabel = ({ id, value, type = 'text', isFocused, onInputChange, children }) => {
   // I think somewhere in the next 10 lines or so
@@ -55,10 +62,19 @@ const InputWithLabel = ({ id, value, type = 'text', isFocused, onInputChange, ch
 };
 
 const useStorageState = (key, initialState) => {
-  const [value, setValue] = React.useState(localStorage.getItem(key) || initialState);
+  const isMounted = React.useRef(false);
+
+  const [value, setValue] = React.useState(
+    localStorage.getItem(key) || initialState
+  );
 
   React.useEffect(() => {
-    localStorage.setItem(key, value);
+    if (!isMounted.current) {
+      isMounted.current = true;
+    } else {
+      console.log('A');
+      localStorage.setItem(key, value);
+    }
   }, [value, key]);
 
   return [value, setValue];
@@ -125,15 +141,16 @@ const App = () => {
   }, [url]);
 
   React.useEffect(() => {
+    console.log("How many times do I log?");
     handleFetchStories();
   }, [handleFetchStories]);
 
-  const handleRemoveStory = (item) => {
+  const handleRemoveStory = React.useCallback((item) => {
     dispatchStories({
       type: REMOVE_STORY,
       payload: item
     });
-  };
+  }, []);
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
