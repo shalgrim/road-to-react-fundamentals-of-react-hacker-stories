@@ -113,6 +113,15 @@ const storiesReducer = (state, action) => {
   }
 };
 
+const getSumComments = (stories) => {
+  console.log("C");
+
+  return stories.data.reduce(
+    (result, value) => result + value.num_comments,
+    0
+  );
+};
+
 const REMOVE_STORY = 'REMOVE_STORY';
 const App = () => {
   const [searchTerm, setSearchTerm] = useStorageState('search', 'React');
@@ -124,6 +133,11 @@ const App = () => {
   const [stories, dispatchStories] = React.useReducer(
     storiesReducer,
     { data: [], isLoading: false, isError: false }
+  );
+
+  const sumComments = React.useMemo(
+    () => getSumComments(stories),
+    [stories]
   );
 
   const handleFetchStories = React.useCallback(async () => {
@@ -196,7 +210,7 @@ const App = () => {
 
   return (
     <div>
-      <h1>My Hacker Stories</h1>
+      <h1>My Hacker Stories with {sumComments} comments.</h1>
 
       <SearchForm
         searchTerm={searchTerm}
