@@ -24,20 +24,18 @@ const Item = ({ item, onRemoveItem }) => {
 
 console.log('B:App');
 
-const List = React.memo(
-  ({ list, onRemoveItem }) =>
-    console.log("B:List") || (
-      <ul>
-        {list.map((item) => (
-          <Item
-            key={item.objectID}
-            item={item}
-            onRemoveItem={onRemoveItem}
-          />
-        ))}
-      </ul>
-    )
-);
+const List = ({ list, onRemoveItem }) =>
+  console.log("B:List") || (
+    <ul>
+      {list.map((item) => (
+        <Item
+          key={item.objectID}
+          item={item}
+          onRemoveItem={onRemoveItem}
+        />
+      ))}
+    </ul>
+  );
 
 const InputWithLabel = ({ id, value, type = 'text', isFocused, onInputChange, children }) => {
   // I think somewhere in the next 10 lines or so
@@ -135,10 +133,7 @@ const App = () => {
     { data: [], isLoading: false, isError: false }
   );
 
-  const sumComments = React.useMemo(
-    () => getSumComments(stories),
-    [stories]
-  );
+  const sumComments = getSumComments(stories);
 
   const handleFetchStories = React.useCallback(async () => {
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
