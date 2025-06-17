@@ -18,10 +18,10 @@ type ItemProps = {
   onRemoveItem: (item: Story) => void;
 };
 
-const Item = ({
+const Item: React.FC<ItemProps> = ({
   item,
   onRemoveItem
-}: ItemProps) => (
+}) => (
   <li>
     <span>
       <a href={item.url}>{item.title}</a>
