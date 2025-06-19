@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import * as vitest from 'vitest';
 import { 
     render,
     screen,
@@ -64,5 +65,11 @@ describe('storiesReducer', () => {
 describe('Item', () => {
     it('renders all properties', () => {
         render(<Item item={storyOne} />);
+        
+        vitest.expect(screen.getByText('Jordan Walke')).toBeInTheDocument();
+        expect(screen.getByText('React')).toHaveAttribute(
+            'href',
+            'https://reactjs.org/'
+        );
     });
 });
