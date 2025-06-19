@@ -1,4 +1,10 @@
 import { describe, it, expect } from 'vitest';
+import { 
+    render,
+    screen,
+    fireEvent,
+    waitFor,
+} from '@testing-library/react';
 
 import App, {
     storiesReducer,
@@ -40,6 +46,23 @@ const stories = [storyOne, storyTwo];
 
 describe('storiesReducer', () => {
     it('removes a story from all stories', () => {
+        const action = { type: 'REMOVE_STORY', payload: storyOne };
+        const state = { data: stories, isLoading: false, isError: false };
 
+        const newState = storiesReducer(state, action);
+
+        const expectedState = {
+            data: [storyTwo],
+            isLoading: false,
+            isError: false,
+        };
+
+        expect(newState).toStrictEqual(expectedState);
+    });
+});
+
+describe('Item', () => {
+    it('renders all properties', () => {
+        render(<Item item={storyOne} />);
     });
 });

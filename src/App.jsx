@@ -97,6 +97,32 @@ const storiesReducer = (state, action) => {
   }
 };
 
+const SearchForm = ({
+  searchTerm,
+  onSearchInput,
+  searchAction,
+}) => (
+  <form action={searchAction}>
+    <InputWithLabel
+      id="search"
+      value={searchTerm}
+      isFocused
+      onInputChange={onSearchInput}
+    >
+      <strong>Search:</strong>
+    </InputWithLabel>
+
+    <button
+      type="submit"
+      disabled={!searchTerm}
+    >
+      Submit
+    </button>
+  </form>
+);
+
+
+
 const REMOVE_STORY = 'REMOVE_STORY';
 const App = () => {
   const [searchTerm, setSearchTerm] = useStorageState('search', 'React');
@@ -152,30 +178,6 @@ const App = () => {
   const searchAction = (event) => {
     setUrl(`${API_ENDPOINT}${searchTerm}`);
   };
-
-  const SearchForm = ({
-    searchTerm,
-    onSearchInput,
-    searchAction,
-  }) => (
-    <form action={searchAction}>
-      <InputWithLabel
-        id="search"
-        value={searchTerm}
-        isFocused
-        onInputChange={onSearchInput}
-      >
-        <strong>Search:</strong>
-      </InputWithLabel>
-
-      <button
-        type="submit"
-        disabled={!searchTerm}
-      >
-        Submit
-      </button>
-    </form>
-  );
 
   return (
     <div>
