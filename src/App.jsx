@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import * as React from 'react';
 import axios from 'axios';
+import _ from 'lodash';
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
 
@@ -10,8 +11,8 @@ const Item = ({ item, onRemoveItem }) => {
       <span>
         <a href={item.url}>{item.title}</a>
       </span>
-      <span>{item.author}</span>
-      <span>{item.num_comments}</span>
+      <span>{item.author}</span> &nbsp;
+      <span>{item.num_comments}</span> &nbsp;
       <span>{item.points}</span>
       <span>
         <button type="button" onClick={() => onRemoveItem(item)}>
@@ -45,16 +46,19 @@ const List = ({ list, onRemoveItem }) => {
         <button type="button" onClick={() => onChangeSort('title')}>
           Sort by Title {sortState.sortBy === 'title' ? (sortState.sortOrder === 'asc' ? '↑' : '↓') : ''}
         </button>
-        <button type="button" onClick={() => onChangeSort('votes')}>
-          Sort by Votes {sortState.sortBy === 'votes' ? (sortState.sortOrder === 'asc' ? '↑' : '↓') : ''}
+        <button type="button" onClick={() => onChangeSort('num_comments')}>
+          Sort by Comments {sortState.sortBy === 'num_comments' ? (sortState.sortOrder === 'asc' ? '↑' : '↓') : ''}
         </button>
-        <button type="button" onClick={() => onChangeSort('comments')}>
-          Sort by Comments {sortState.sortBy === 'comments' ? (sortState.sortOrder === 'asc' ? '↑' : '↓') : ''}
+        <button type="button" onClick={() => onChangeSort('points')}>
+          Sort by Votes {sortState.sortBy === 'points' ? (sortState.sortOrder === 'asc' ? '↑' : '↓') : ''}
         </button>
       </div>
       <div>
         <ul>
-          {list.map((item) => (
+          {_.orderBy(list,
+            [sortState.sortBy],
+            [sortState.sortOrder]
+          ).map((item) => (
             <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
           ))}
         </ul>
