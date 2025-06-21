@@ -41,20 +41,24 @@ const List = ({ list, onRemoveItem }) => {
   };
 
   return (
-    <div>
-      <div>
+    <ul>
+      <li>
+        <span>
         <button type="button" onClick={() => onChangeSort('title')}>
           Sort by Title {sortState.sortBy === 'title' ? (sortState.sortOrder === 'asc' ? '↑' : '↓') : ''}
         </button>
+        </span>
+        <span>
         <button type="button" onClick={() => onChangeSort('num_comments')}>
           Sort by Comments {sortState.sortBy === 'num_comments' ? (sortState.sortOrder === 'asc' ? '↑' : '↓') : ''}
         </button>
+        </span>
+        <span>
         <button type="button" onClick={() => onChangeSort('points')}>
           Sort by Votes {sortState.sortBy === 'points' ? (sortState.sortOrder === 'asc' ? '↑' : '↓') : ''}
         </button>
-      </div>
-      <div>
-        <ul>
+        </span>
+        </li>
           <li style={{ display: 'flex' }}>
             <span style={{ width: '40%' }}>Title</span>
             <span style={{ width: '30%' }}>Author</span>
@@ -69,8 +73,6 @@ const List = ({ list, onRemoveItem }) => {
             <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
           ))}
         </ul>
-      </div>
-    </div>
   );
 };
 
