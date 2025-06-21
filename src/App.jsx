@@ -23,12 +23,43 @@ const Item = ({ item, onRemoveItem }) => {
 };
 
 const List = ({ list, onRemoveItem }) => {
+  const [sortState, setSortState] = React.useState({ sortBy: 'title', sortOrder: 'asc' });
+
+  const onChangeSort = (sortBy) => {
+    if (sortState.sortBy === sortBy) {
+      setSortState({
+        ...sortState,
+        sortOrder: sortState.sortOrder === 'asc' ? 'desc' : 'asc',
+      });
+    } else {
+      setSortState({
+        sortBy,
+        sortOrder: 'asc',
+      });
+    }
+  };
+
   return (
-    <ul>
-      {list.map((item) => (
-        <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
-      ))}
-    </ul>
+    <div>
+      <div>
+        <button type="button" onClick={() => onChangeSort('title')}>
+          Sort by Title {sortState.sortBy === 'title' ? (sortState.sortOrder === 'asc' ? '↑' : '↓') : ''}
+        </button>
+        <button type="button" onClick={() => onChangeSort('votes')}>
+          Sort by Votes {sortState.sortBy === 'votes' ? (sortState.sortOrder === 'asc' ? '↑' : '↓') : ''}
+        </button>
+        <button type="button" onClick={() => onChangeSort('comments')}>
+          Sort by Comments {sortState.sortBy === 'comments' ? (sortState.sortOrder === 'asc' ? '↑' : '↓') : ''}
+        </button>
+      </div>
+      <div>
+        <ul>
+          {list.map((item) => (
+            <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 };
 
