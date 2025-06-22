@@ -44,35 +44,35 @@ const List = ({ list, onRemoveItem }) => {
     <ul>
       <li>
         <span>
-        <button type="button" onClick={() => onChangeSort('title')}>
-          Sort by Title {sortState.sortBy === 'title' ? (sortState.sortOrder === 'asc' ? '↑' : '↓') : ''}
-        </button>
+          <button type="button" onClick={() => onChangeSort('title')}>
+            Sort by Title {sortState.sortBy === 'title' ? (sortState.sortOrder === 'asc' ? '↑' : '↓') : ''}
+          </button>
         </span>
         <span>
-        <button type="button" onClick={() => onChangeSort('num_comments')}>
-          Sort by Comments {sortState.sortBy === 'num_comments' ? (sortState.sortOrder === 'asc' ? '↑' : '↓') : ''}
-        </button>
+          <button type="button" onClick={() => onChangeSort('num_comments')}>
+            Sort by Comments {sortState.sortBy === 'num_comments' ? (sortState.sortOrder === 'asc' ? '↑' : '↓') : ''}
+          </button>
         </span>
         <span>
-        <button type="button" onClick={() => onChangeSort('points')}>
-          Sort by Votes {sortState.sortBy === 'points' ? (sortState.sortOrder === 'asc' ? '↑' : '↓') : ''}
-        </button>
+          <button type="button" onClick={() => onChangeSort('points')}>
+            Sort by Votes {sortState.sortBy === 'points' ? (sortState.sortOrder === 'asc' ? '↑' : '↓') : ''}
+          </button>
         </span>
-        </li>
-          <li style={{ display: 'flex' }}>
-            <span style={{ width: '40%' }}>Title</span>
-            <span style={{ width: '30%' }}>Author</span>
-            <span style={{ width: '10%' }}>Comments</span>
-            <span style={{ width: '10%' }}>Points</span>
-            <span style={{ width: '10%' }}>Actions</span>
-          </li>
-          {_.orderBy(list,
-            [sortState.sortBy],
-            [sortState.sortOrder]
-          ).map((item) => (
-            <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
-          ))}
-        </ul>
+      </li>
+      <li style={{ display: 'flex' }}>
+        <span style={{ width: '40%' }}>Title</span>
+        <span style={{ width: '30%' }}>Author</span>
+        <span style={{ width: '10%' }}>Comments</span>
+        <span style={{ width: '10%' }}>Points</span>
+        <span style={{ width: '10%' }}>Actions</span>
+      </li>
+      {_.orderBy(list,
+        [sortState.sortBy],
+        [sortState.sortOrder]
+      ).map((item) => (
+        <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
+      ))}
+    </ul>
   );
 };
 
@@ -145,8 +145,8 @@ const REMOVE_STORY = 'REMOVE_STORY';
 const App = () => {
   const [searchTerm, setSearchTerm] = useStorageState('search', 'React');
 
-  const [url, setUrl] = React.useState(
-    `${API_ENDPOINT}${searchTerm}`
+  const [urls, setUrls] = React.useState(
+    [`${API_ENDPOINT}${searchTerm}`]
   );
 
   const [stories, dispatchStories] = React.useReducer(
@@ -158,7 +158,7 @@ const App = () => {
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
 
     try {
-      const result = await axios.get(url);
+      const result = await axios.get(urls[0]);
       dispatchStories({
         type: 'STORIES_FETCH_SUCCESS',
         payload: result.data.hits
@@ -166,7 +166,7 @@ const App = () => {
     } catch {
       dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
     }
-  }, [url]);
+  }, [urls]);
 
   React.useEffect(() => {
     handleFetchStories();
@@ -194,8 +194,34 @@ const App = () => {
   };
 
   const searchAction = (event) => {
-    setUrl(`${API_ENDPOINT}${searchTerm}`);
+    const newUrl = `${API_ENDPOINT}${searchTerm}`;
+    if (newUrl === urls[0]) {
+      return;
+    }
+
+    const newUrls = _.slice(_.uniq([newUrl, ...urls]), 0, 5);
+    setUrls(newUrls);
   };
+
+  const LastSearches = ({ urls }) => (
+    <div>
+      <h2>Last Searches</h2>
+      {urls.map((url) => (
+        <button
+          key={url}
+          type="button"
+          onClick={() => {
+            setSearchTerm(url.replace(API_ENDPOINT, ''));
+            searchAction();
+          }}
+        >
+          {url.split("=").pop()}
+        </button>
+      )
+      )}
+    </div>
+  );
+
 
   const SearchForm = ({
     searchTerm,
@@ -230,6 +256,10 @@ const App = () => {
         onSearchInput={handleSearchInput}
         searchAction={searchAction}
       />
+
+      <hr />
+
+      <LastSearches urls={urls} />
 
       <hr />
 
